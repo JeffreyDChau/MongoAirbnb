@@ -4,6 +4,10 @@
     <title>Find Airbnb Listing</title>
 </head>
 <body>
+    <label for="collection">Collection:</label>
+    <input type="text" id="collection" name="collection"><br><br>
+    <label for="database">Database:</label>
+    <input type="text" id="database" name="database"><br><br>
     <label for="property_type">Property Type:</label>
     <input type="text" id="property_type" name="property_type"><br><br>
     <label for="bedrooms">Bedrooms:</label>
@@ -14,13 +18,41 @@
 <ul id="listing"></ul>
 <script>
     function searchListing() {
+        const collection = document.getElementById("collection").value;
+        const database = document.getElementById("database").value;
         const property_type = document.getElementById("property_type").value;
         const bedrooms = document.getElementById("bedrooms").value;
         const beds = document.getElementById("beds").value;
-        const queryString = `property_type=${property_type}&bedrooms=${bedrooms}&beds=${beds}`;
-        fetch(`http://localhost:3000/findOne`)
+        
+        const data = {
+            collection: collection,
+            database: database,
+            filter: {
+                property_type: property_type,
+                bedrooms: parseInt(bedrooms),
+                beds: parseInt(beds)
+            },
+            projection: {
+                listing_url: 1,
+                name: 1,
+                summary: 1,
+                property_type: 1,
+                bedrooms: 1,
+                beds: 1
+            }
+        };
+        
+
+        fetch(`http://localhost:3000/findOne`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(data)
+        })
         .then(response => response.json())
         .then(data => {
+            console.log(data)
             const listing = document.getElementById("listing");
             listing.innerHTML = `
                 <li>Listing URL: ${data.listing_url}</li>
